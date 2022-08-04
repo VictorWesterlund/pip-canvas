@@ -15,6 +15,17 @@ export class PipCanvas {
 
 	// Create from image
 	HTMLImageElement() {
+		const img = new URL(this.source.src);
+		const isDataUrl = new RegExp("^\s*data:");
+
+		// Can not open cross-origin images
+		if (!isDataUrl.test(this.source.src) && (img.origin !== window.location.origin)) {
+			const error = "PipCanvas: This cross-origin image can not be opened in PIP";
+
+			alert(error);
+			throw new Error(error);
+		}
+
 		this.ctx.width = this.ctx.canvas.width = this.source.width;
 		this.ctx.height = this.ctx.canvas.height = this.source.height;
 
@@ -23,7 +34,9 @@ export class PipCanvas {
 
 	// Open PIP
 	open() {
-		this.video.play();
-		this.video.requestPictureInPicture();
+		this.video.addEventListener("canplaythrough",() => {
+			this.video.play();
+			this.video.requestPictureInPicture();
+		});
 	}
 }
